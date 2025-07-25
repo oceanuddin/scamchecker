@@ -216,8 +216,9 @@ IMPORTANT: Always include a confidence percentage in the confidence field. Respo
 });
 
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Health check available at: http://localhost:${PORT}/`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`API Key available: ${process.env.OPENAI_API_KEY ? 'YES' : 'NO'}`);
 }); 
