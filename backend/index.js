@@ -45,17 +45,20 @@ const openai = new OpenAI({
 
 // Text scenario endpoint
 app.post('/api/check-scam', async (req, res) => {
-  const { scenario } = req.body;
-  if (!scenario) return res.status(400).json({ error: 'No scenario provided' });
-
-  // Check if OpenAI API key is available
-  if (!process.env.OPENAI_API_KEY) {
-    return res.status(500).json({ 
-      error: 'OpenAI API key not configured. Please add OPENAI_API_KEY to environment variables.' 
-    });
-  }
-
+  console.log('Received text scam check request');
+  
   try {
+    const { scenario } = req.body;
+    if (!scenario) return res.status(400).json({ error: 'No scenario provided' });
+
+    // Check if OpenAI API key is available
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({ 
+        error: 'OpenAI API key not configured. Please add OPENAI_API_KEY to environment variables.' 
+      });
+    }
+
+    console.log('Making OpenAI API call...');
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [
@@ -123,18 +126,21 @@ IMPORTANT: Always include a confidence percentage in the confidence field. Respo
 
 // Image upload endpoint with OpenAI Vision
 app.post('/api/check-scam-image', upload.single('image'), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No image uploaded' });
-  }
-
-  // Check if OpenAI API key is available
-  if (!process.env.OPENAI_API_KEY) {
-    return res.status(500).json({ 
-      error: 'OpenAI API key not configured. Please add OPENAI_API_KEY to environment variables.' 
-    });
-  }
-
+  console.log('Received image scam check request');
+  
   try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image uploaded' });
+    }
+
+    // Check if OpenAI API key is available
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({ 
+        error: 'OpenAI API key not configured. Please add OPENAI_API_KEY to environment variables.' 
+      });
+    }
+
+    console.log('Processing image for OpenAI Vision...');
     const imagePath = path.join(__dirname, req.file.path);
     const imageData = fs.readFileSync(imagePath, { encoding: 'base64' });
 
