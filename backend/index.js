@@ -75,32 +75,33 @@ app.post('/api/check-scam', async (req, res) => {
       messages: [
         {
           role: 'system',
-          content: `You are a cybersecurity AI specialized in detecting phishing, scam, and fraud attempts in emails, messages, and websites. Analyze the provided text or screenshot for potential scam indicators — even if the message appears professional or realistic.
+          content: `You are a scam detection AI trained to analyze messages and identify if they are safe or scams. Given a user submission (text or OCR from a screenshot), respond with one of the following verdicts:
 
-Focus especially on the following red flags:
+- "Scam" – if the message contains known red flags or scam-like behavior
+- "Safe" – if the message appears legitimate and lacks scam signals
 
-Suspicious URLs (e.g., misspelled domains, lookalikes like boa-alert.com instead of bankofamerica.com)
+Always include:
+1. **Verdict**: "Scam" or "Safe"
+2. **Confidence Score**: Percentage from 0–100%
+3. **Red Flags**: A bullet list of any suspicious traits (or say "No red flags detected")
+4. **Recommended Actions**: Simple, helpful next steps for the user
+5. **AI Analysis**: A short natural-language explanation of why this verdict was given (human, clear, non-robotic)
 
-Urgency or Threats (e.g., "Act now or your account will be locked")
+Evaluate messages based on:
+- Urgency or fear tactics
+- Requests for money, gift cards, or crypto
+- Impersonation of authority (CEO, IRS, police, banks)
+- Suspicious links or domains
+- Poor grammar, generic phrasing, or unsolicited contact
 
-Requests for sensitive info (login credentials, SSN, bank details, etc.)
+If the message lacks clear context but still appears suspicious, classify it as **Scam** with lower confidence. If it seems legitimate but not guaranteed, classify it as **Safe** with moderate confidence.
 
-Mismatched sender info (display name vs actual domain)
-
-Unusual grammar or formatting
-
-Spoofed branding (legitimate logos or layout with fake links)
-
-Your job is to classify the message as "Scam," "Safe," or "Unclear", and provide a confidence score.
-
-Be conservative: if any scam indicators are present, lean toward "Scam" unless proven otherwise.
-
-Also include a list of specific red flags, and actionable steps for users to verify legitimacy.
+Do **not** use an "Unclear" label — your confidence score should communicate uncertainty instead.
 
 Return a JSON object with the following fields:
-- verdict: string (e.g., "This is likely a SCAM", "This is likely SAFE", "Unclear")
+- verdict: string ("Scam" or "Safe")
 - confidence: string (MUST include percentage, e.g., "High (93%)", "Medium (70%)", "Low (55%)")
-- redFlags: array of strings (each a red flag found)
+- redFlags: array of strings (each a red flag found, or ["No red flags detected"])
 - actions: array of objects with { title: string, description: string }
 - analysis: string (a paragraph summary of your reasoning)
 
@@ -161,32 +162,33 @@ app.post('/api/check-scam-image', upload.single('image'), async (req, res) => {
       messages: [
         {
           role: 'system',
-          content: `You are a cybersecurity AI specialized in detecting phishing, scam, and fraud attempts in emails, messages, and websites. Analyze the provided text or screenshot for potential scam indicators — even if the message appears professional or realistic.
+          content: `You are a scam detection AI trained to analyze messages and identify if they are safe or scams. Given a user submission (text or OCR from a screenshot), respond with one of the following verdicts:
 
-Focus especially on the following red flags:
+- "Scam" – if the message contains known red flags or scam-like behavior
+- "Safe" – if the message appears legitimate and lacks scam signals
 
-Suspicious URLs (e.g., misspelled domains, lookalikes like boa-alert.com instead of bankofamerica.com)
+Always include:
+1. **Verdict**: "Scam" or "Safe"
+2. **Confidence Score**: Percentage from 0–100%
+3. **Red Flags**: A bullet list of any suspicious traits (or say "No red flags detected")
+4. **Recommended Actions**: Simple, helpful next steps for the user
+5. **AI Analysis**: A short natural-language explanation of why this verdict was given (human, clear, non-robotic)
 
-Urgency or Threats (e.g., "Act now or your account will be locked")
+Evaluate messages based on:
+- Urgency or fear tactics
+- Requests for money, gift cards, or crypto
+- Impersonation of authority (CEO, IRS, police, banks)
+- Suspicious links or domains
+- Poor grammar, generic phrasing, or unsolicited contact
 
-Requests for sensitive info (login credentials, SSN, bank details, etc.)
+If the message lacks clear context but still appears suspicious, classify it as **Scam** with lower confidence. If it seems legitimate but not guaranteed, classify it as **Safe** with moderate confidence.
 
-Mismatched sender info (display name vs actual domain)
-
-Unusual grammar or formatting
-
-Spoofed branding (legitimate logos or layout with fake links)
-
-Your job is to classify the message as "Scam," "Safe," or "Unclear", and provide a confidence score.
-
-Be conservative: if any scam indicators are present, lean toward "Scam" unless proven otherwise.
-
-Also include a list of specific red flags, and actionable steps for users to verify legitimacy.
+Do **not** use an "Unclear" label — your confidence score should communicate uncertainty instead.
 
 Return a JSON object with the following fields:
-- verdict: string (e.g., "This is likely a SCAM", "This is likely SAFE", "Unclear")
+- verdict: string ("Scam" or "Safe")
 - confidence: string (MUST include percentage, e.g., "High (93%)", "Medium (70%)", "Low (55%)")
-- redFlags: array of strings (each a red flag found)
+- redFlags: array of strings (each a red flag found, or ["No red flags detected"])
 - actions: array of objects with { title: string, description: string }
 - analysis: string (a paragraph summary of your reasoning)
 
@@ -232,8 +234,8 @@ IMPORTANT: Always include a confidence percentage in the confidence field. Respo
   }
 });
 
-// Use Railway's PORT or default to 3000
-const PORT = process.env.PORT || 3000;
+// Use Railway's PORT or default to 5050
+const PORT = process.env.PORT || 5050;
 console.log(`Starting server on port: ${PORT}`);
 console.log(`PORT environment variable: "${process.env.PORT}"`);
 console.log(`All environment variables:`, Object.keys(process.env));
