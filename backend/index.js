@@ -23,6 +23,11 @@ app.use((req, res, next) => {
 app.use(express.json());
 const upload = multer({ dest: 'uploads/' });
 
+// Health check endpoint
+app.get('/', (req, res) => {
+  res.json({ status: 'OK', message: 'Scam Checker Backend is running' });
+});
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
