@@ -33,6 +33,15 @@ app.get('/', (req, res) => {
   res.json({ status: 'OK', message: 'Scam Checker Backend is running' });
 });
 
+// Simple test endpoint
+app.get('/test', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'Test endpoint working',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Check if OpenAI API key is available
 if (!process.env.OPENAI_API_KEY) {
   console.error('ERROR: OPENAI_API_KEY environment variable is not set!');
@@ -227,4 +236,5 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`Health check available at: http://localhost:${PORT}/`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`API Key available: ${process.env.OPENAI_API_KEY ? 'YES' : 'NO'}`);
+  console.log(`Server bound to 0.0.0.0:${PORT}`);
 }); 
