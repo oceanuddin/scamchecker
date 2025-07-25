@@ -230,9 +230,11 @@ IMPORTANT: Always include a confidence percentage in the confidence field. Respo
   }
 });
 
+// Use Railway's PORT or default to 3000
 const PORT = process.env.PORT || 3000;
 console.log(`Starting server on port: ${PORT}`);
-console.log(`Environment variables:`, Object.keys(process.env).filter(key => key.includes('PORT') || key.includes('RAILWAY')));
+console.log(`PORT environment variable: "${process.env.PORT}"`);
+console.log(`All environment variables:`, Object.keys(process.env));
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
