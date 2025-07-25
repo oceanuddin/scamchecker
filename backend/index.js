@@ -9,13 +9,18 @@ const app = express();
 
 // --- ABSOLUTE FIRST: CORS HANDLER ---
 app.use((req, res, next) => {
+  // Allow all origins
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'false');
+  
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
+    res.status(200).end();
+    return;
   }
+  
   next();
 });
 // -------------------------------------
@@ -28,6 +33,12 @@ app.get('/', (req, res) => {
   res.json({ status: 'OK', message: 'Scam Checker Backend is running' });
 });
 
+// Check if OpenAI API key is available
+if (!process.env.OPENAI_API_KEY) {
+  console.error('ERROR: OPENAI_API_KEY environment variable is not set!');
+  console.error('Please add your OpenAI API key to Railway environment variables.');
+}
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
@@ -36,6 +47,13 @@ const openai = new OpenAI({
 app.post('/api/check-scam', async (req, res) => {
   const { scenario } = req.body;
   if (!scenario) return res.status(400).json({ error: 'No scenario provided' });
+
+  // Check if OpenAI API key is available
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(500).json({ 
+      error: 'OpenAI API key not configured. Please add OPENAI_API_KEY to environment variables.' 
+    });
+  }
 
   try {
     const response = await openai.chat.completions.create({
@@ -107,6 +125,13 @@ IMPORTANT: Always include a confidence percentage in the confidence field. Respo
 app.post('/api/check-scam-image', upload.single('image'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No image uploaded' });
+  }
+
+  // Check if OpenAI API key is available
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(500).json({ 
+      error: 'OpenAI API key not configured. Please add OPENAI_API_KEY to environment variables.' 
+    });
   }
 
   try {
