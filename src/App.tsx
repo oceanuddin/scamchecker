@@ -20,7 +20,7 @@ export function App() {
     try {
       let data: any = {};
       if (type === 'text' && typeof input === 'string') {
-        const res = await fetch('http://localhost:5050/api/check-scam', {
+        const res = await fetch('https://scamchecker-production.up.railway.app/api/check-scam', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ scenario: input })
@@ -29,7 +29,7 @@ export function App() {
       } else if (type === 'image' && input instanceof File) {
         const formData = new FormData();
         formData.append('image', input);
-        const res = await fetch('http://localhost:5050/api/check-scam-image', {
+        const res = await fetch('https://scamchecker-production.up.railway.app/api/check-scam-image', {
           method: 'POST',
           body: formData
         });
