@@ -30,11 +30,13 @@ const upload = multer({ dest: 'uploads/' });
 
 // Health check endpoint
 app.get('/', (req, res) => {
+  console.log('Health check endpoint hit');
   res.json({ status: 'OK', message: 'Scam Checker Backend is running' });
 });
 
 // Simple test endpoint
 app.get('/test', (req, res) => {
+  console.log('Test endpoint hit');
   res.json({ 
     status: 'OK', 
     message: 'Test endpoint working',
