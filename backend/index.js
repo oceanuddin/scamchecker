@@ -231,6 +231,9 @@ IMPORTANT: Always include a confidence percentage in the confidence field. Respo
 });
 
 const PORT = process.env.PORT || 3000;
+console.log(`Starting server on port: ${PORT}`);
+console.log(`Environment variables:`, Object.keys(process.env).filter(key => key.includes('PORT') || key.includes('RAILWAY')));
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Health check available at: http://localhost:${PORT}/`);
