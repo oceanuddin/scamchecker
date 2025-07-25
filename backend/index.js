@@ -190,5 +190,9 @@ IMPORTANT: Always include a confidence percentage in the confidence field. Respo
   }
 });
 
-const PORT = process.env.PORT || 5050;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`)); 
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Health check available at: http://localhost:${PORT}/`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+}); 
