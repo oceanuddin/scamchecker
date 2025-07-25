@@ -230,11 +230,13 @@ IMPORTANT: Always include a confidence percentage in the confidence field. Respo
   }
 });
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Health check available at: http://localhost:${PORT}/`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`API Key available: ${process.env.OPENAI_API_KEY ? 'YES' : 'NO'}`);
   console.log(`Server bound to 0.0.0.0:${PORT}`);
+  console.log(`Process ID: ${process.pid}`);
+  console.log(`Node version: ${process.version}`);
 }); 
