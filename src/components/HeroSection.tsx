@@ -24,11 +24,20 @@ export const HeroSection = ({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   
   const MAX_CHARACTERS = 1000;
+  const MIN_CHARACTERS = 50;
   const characterCount = textInput.length;
   const isOverLimit = characterCount > MAX_CHARACTERS;
+  const isTooShort = characterCount < MIN_CHARACTERS;
 
   const validateFile = (file: File) => {
     const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setFileError('Only PNG, JPG, or WEBP images are allowed.');
+      setIsWiggling(true);
+      setTimeout(() => setIsWiggling(false), 600);
+      return false;
+    }
     if (file.size > maxSize) {
       setFileError('Your files are too powerful! Maximum size is 5MB.');
       setIsWiggling(true);
@@ -64,6 +73,12 @@ export const HeroSection = ({
     if (activeTab === 'text') {
       if (!textInput.trim()) {
         setMissingInputError('Please enter a description.');
+        setIsButtonWiggling(true);
+        setTimeout(() => setIsButtonWiggling(false), 600);
+        return;
+      }
+      if (textInput.trim().length < 50) {
+        setMissingInputError('Please enter at least 50 characters for better analysis.');
         setIsButtonWiggling(true);
         setTimeout(() => setIsButtonWiggling(false), 600);
         return;
@@ -148,7 +163,7 @@ export const HeroSection = ({
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
+                  accept=".png,.jpg,.jpeg,.webp"
                   onChange={handleImageChange}
                   className="hidden"
                   disabled={loading}
@@ -177,12 +192,17 @@ export const HeroSection = ({
                 maxLength={MAX_CHARACTERS}
               />
               <div className="flex justify-between items-center text-sm">
-                <span className={`${isOverLimit ? 'text-red-400' : 'text-white/60'}`}>
+                <span className={`${isOverLimit || (isTooShort && characterCount > 0) ? 'text-red-400' : 'text-white/60'}`}>
                   {characterCount} / {MAX_CHARACTERS} characters
                 </span>
                 {isOverLimit && (
                   <span className="text-red-400 font-medium">
                     Character limit exceeded!
+                  </span>
+                )}
+                {isTooShort && characterCount > 0 && (
+                  <span className="text-red-400 font-medium">
+                    Minimum {MIN_CHARACTERS} characters required
                   </span>
                 )}
               </div>
@@ -193,7 +213,7 @@ export const HeroSection = ({
               size="lg" 
               className={`group ${isButtonWiggling ? 'animate-wiggle' : ''}`} 
               onClick={handleSubmit}
-              disabled={loading || !canSubmit}
+              disabled={loading}
             >
               {loading ? (
                 <div className="flex items-center gap-2">
@@ -207,12 +227,12 @@ export const HeroSection = ({
                 </>
               )}
             </Button>
-            {missingInputError && (
-              <div className="mt-3 text-center">
-                <span className="text-red-400 font-medium text-sm">{missingInputError}</span>
-              </div>
-            )}
           </div>
+          {missingInputError && (
+            <div className="mt-3 text-center">
+              <span className="text-red-400 font-medium text-sm">{missingInputError}</span>
+            </div>
+          )}
         </div>
       </GlassPanel>
     </section>;
