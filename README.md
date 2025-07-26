@@ -245,25 +245,6 @@ Similar structure to text analysis, with additional visual context from the uplo
 - **Loading States**: Smooth transitions during processing
 - **Responsive Design**: Mobile-first approach
 
-## 🔍 Link Analysis Features
-
-### URL Detection
-- Extracts all URLs from text submissions
-- Supports HTTP and HTTPS protocols
-- Handles various URL formats and encodings
-
-### Suspicious Pattern Detection
-- **URL Shorteners**: bit.ly, tinyurl, goo.gl, etc.
-- **Suspicious Keywords**: crypto, wallet, verify, secure, login
-- **Brand Impersonation**: paypal, amazon, microsoft, apple
-- **Financial Terms**: bank, account, payment, transfer
-
-### Reddit Integration
-- Searches Reddit for scam reports
-- Filters by relevant subreddits
-- Provides direct links to posts
-- Shows post scores and subreddit names
-- Limits to 5 most relevant results per URL
 
 ## 🚀 Deployment
 
