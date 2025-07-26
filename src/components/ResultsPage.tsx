@@ -1,7 +1,7 @@
 import React from 'react';
 import { GlassPanel } from './GlassPanel';
 import { Button } from './Button';
-import { AlertCircleIcon, ShieldCheckIcon, HelpCircleIcon, ArrowLeftIcon, ListIcon, PhoneIcon } from 'lucide-react';
+import { AlertCircleIcon, ShieldCheckIcon, HelpCircleIcon, ArrowLeftIcon, Link2Icon, PhoneIcon } from 'lucide-react';
 
 interface ResultsPageProps {
   result: {
@@ -103,7 +103,7 @@ export const ResultsPage = ({ result, onCheckAnother }: ResultsPageProps) => {
         {/* Red Flags */}
         <GlassPanel className="p-6">
           <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <ListIcon size={20} className={verdictType === 'safe' ? 'text-green-400' : 'text-red-400'} />
+            <ShieldCheckIcon size={20} className={verdictType === 'safe' ? 'text-green-400' : 'text-red-400'} />
             {verdictType === 'safe' ? 'Safety Signals' : 'Red Flags'}
           </h3>
           <ul className="space-y-3">
@@ -140,10 +140,10 @@ export const ResultsPage = ({ result, onCheckAnother }: ResultsPageProps) => {
       </GlassPanel>
 
       {/* Link Analysis Section */}
-      {parsedResult.linkAnalysis && parsedResult.linkAnalysis.totalUrls > 0 && (
+      {parsedResult.linkAnalysis && parsedResult.linkAnalysis.details && parsedResult.linkAnalysis.details.length > 0 && (
         <GlassPanel className="p-6 mb-8">
           <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <ListIcon size={20} className="text-purple-400" />
+            <Link2Icon size={20} className="text-purple-400" />
             Link Analysis
           </h3>
           <div className="space-y-4">
@@ -161,7 +161,6 @@ export const ResultsPage = ({ result, onCheckAnother }: ResultsPageProps) => {
                 <div className="text-sm text-white/60">Reddit Reports</div>
               </div>
             </div>
-            
             {parsedResult.linkAnalysis.details.map((detail, index) => (
               <div key={index} className={`border rounded-lg p-4 ${detail.suspicious ? 'border-red-500/30 bg-red-500/10' : 'border-green-500/30 bg-green-500/10'}`}>
                 <div className="flex items-center justify-between mb-2">
@@ -196,7 +195,6 @@ export const ResultsPage = ({ result, onCheckAnother }: ResultsPageProps) => {
           </div>
         </GlassPanel>
       )}
-
       {/* Actions */}
       <div className="flex justify-center">
         <Button variant="secondary" size="lg" className="group" onClick={onCheckAnother}>
