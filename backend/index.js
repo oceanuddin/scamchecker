@@ -27,7 +27,27 @@ app.use((req, res, next) => {
 // -------------------------------------
 
 app.use(express.json());
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ 
+  dest: 'uploads/',
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
+
+// Error handling middleware for multer
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ 
+        error: 'File too large. Maximum size is 5MB.' 
+      });
+    }
+    return res.status(400).json({ 
+      error: 'File upload error: ' + error.message 
+    });
+  }
+  next(error);
+});
 
 // Health check endpoint
 app.get('/', (req, res) => {
@@ -195,6 +215,13 @@ app.post('/api/check-scam-image', upload.single('image'), securityMiddleware.sec
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image uploaded' });
+    }
+    
+    // Check file size (additional validation)
+    if (req.file.size > 5 * 1024 * 1024) {
+      return res.status(400).json({ 
+        error: 'File too large. Maximum size is 5MB.' 
+      });
     }
 
     // Check if OpenAI API key is available
