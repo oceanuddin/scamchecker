@@ -16,11 +16,28 @@ export const HeroSection = ({
   const [activeTab, setActiveTab] = useState<'image' | 'text'>('image');
   const [textInput, setTextInput] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [isWiggling, setIsWiggling] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const validateFile = (file: File) => {
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      setFileError('Your files are too powerful! Maximum size is 5MB.');
+      setIsWiggling(true);
+      setTimeout(() => setIsWiggling(false), 600);
+      return false;
+    }
+    setFileError(null);
+    return true;
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setImageFile(e.target.files[0]);
+      const file = e.target.files[0];
+      if (validateFile(file)) {
+        setImageFile(file);
+      }
     }
   };
 
@@ -65,12 +82,19 @@ export const HeroSection = ({
           </div>
           {activeTab === 'image' ? (
             <div
-              className="bg-white/5 border-2 border-dashed border-white/20 rounded-xl p-10 text-center cursor-pointer hover:bg-white/8 transition-all"
+              className={`bg-white/5 border-2 border-dashed rounded-xl p-10 text-center cursor-pointer hover:bg-white/8 transition-all ${
+                fileError 
+                  ? 'border-red-400 bg-red-500/10' 
+                  : 'border-white/20'
+              } ${isWiggling ? 'animate-wiggle' : ''}`}
               onDragOver={e => e.preventDefault()}
               onDrop={e => {
                 e.preventDefault();
                 if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                  setImageFile(e.dataTransfer.files[0]);
+                  const file = e.dataTransfer.files[0];
+                  if (validateFile(file)) {
+                    setImageFile(file);
+                  }
                 }
               }}
               onClick={() => !loading && fileInputRef.current?.click()}
@@ -97,6 +121,11 @@ export const HeroSection = ({
                   disabled={loading}
                 />
                 {imageFile && <p className="text-xs text-white/60 mt-2">Selected: {imageFile.name}</p>}
+                {fileError && (
+                  <div className="mt-4 p-3 bg-red-500/20 border border-red-400/30 rounded-lg">
+                    <p className="text-red-300 text-sm font-medium">{fileError}</p>
+                  </div>
+                )}
                 <p className="text-xs text-white/40 mt-2">
                   Supports PNG, JPG, WEBP up to 5MB
                 </p>
