@@ -9,7 +9,7 @@ A sophisticated web application that uses OpenAI's AI to detect scams in text de
 
 ## 🌟 Live Demo
 
-**🔗 Production Site:** [https://scamchecker-beta.vercel.app](https://scamchecker-beta.vercel.app)
+**🔗 Production Site:** [https://www.checkifthisisascamfor.me)
 
 ## ✨ Features
 
