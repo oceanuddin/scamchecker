@@ -19,6 +19,10 @@ export const HeroSection = ({
   const [fileError, setFileError] = useState<string | null>(null);
   const [isWiggling, setIsWiggling] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  
+  const MAX_CHARACTERS = 1000;
+  const characterCount = textInput.length;
+  const isOverLimit = characterCount > MAX_CHARACTERS;
 
   const validateFile = (file: File) => {
     const maxSize = 5 * 1024 * 1024; // 5MB
@@ -49,7 +53,7 @@ export const HeroSection = ({
     }
   };
 
-  const canSubmit = (activeTab === 'text' && textInput.trim()) || (activeTab === 'image' && imageFile);
+  const canSubmit = (activeTab === 'text' && textInput.trim() && !isOverLimit) || (activeTab === 'image' && imageFile);
 
   return <section className="relative min-h-screen w-full flex flex-col items-center justify-center px-4 py-20">
       <div className="text-center mb-10 max-w-3xl">
@@ -134,12 +138,25 @@ export const HeroSection = ({
           ) : (
             <div className="flex flex-col gap-4">
               <textarea 
-                className="w-full bg-white/5 border border-white/20 rounded-xl p-4 h-40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-white placeholder-white/40" 
+                className={`w-full bg-white/5 border rounded-xl p-4 h-40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-white placeholder-white/40 ${
+                  isOverLimit ? 'border-red-400 bg-red-500/10' : 'border-white/20'
+                }`}
                 placeholder="Describe your situation in detail... For example: 'I received an email claiming to be from Amazon saying my account will be suspended unless I verify my information through this link...'" 
                 value={textInput} 
                 onChange={e => setTextInput(e.target.value)}
                 disabled={loading}
+                maxLength={MAX_CHARACTERS}
               />
+              <div className="flex justify-between items-center text-sm">
+                <span className={`${isOverLimit ? 'text-red-400' : 'text-white/60'}`}>
+                  {characterCount} / {MAX_CHARACTERS} characters
+                </span>
+                {isOverLimit && (
+                  <span className="text-red-400 font-medium">
+                    Character limit exceeded!
+                  </span>
+                )}
+              </div>
             </div>
           )}
           <div className="flex justify-center">
