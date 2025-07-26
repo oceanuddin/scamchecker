@@ -4,6 +4,7 @@ const multer = require('multer');
 const OpenAI = require('openai');
 const fs = require('fs');
 const path = require('path');
+const securityMiddleware = require('./securityMiddleware');
 
 const app = express();
 
@@ -44,6 +45,16 @@ app.get('/test', (req, res) => {
   });
 });
 
+// Security stats endpoint
+app.get('/security-stats', (req, res) => {
+  console.log('Security stats endpoint hit');
+  res.json({
+    status: 'OK',
+    stats: securityMiddleware.getSecurityStats(),
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Check if OpenAI API key is available
 if (!process.env.OPENAI_API_KEY) {
   console.error('ERROR: OPENAI_API_KEY environment variable is not set!');
@@ -55,7 +66,7 @@ const openai = new OpenAI({
 });
 
 // Text scenario endpoint
-app.post('/api/check-scam', async (req, res) => {
+app.post('/api/check-scam', securityMiddleware.securityCheck.bind(securityMiddleware), async (req, res) => {
   console.log('Received text scam check request');
   
   try {
@@ -70,6 +81,13 @@ app.post('/api/check-scam', async (req, res) => {
     }
 
     console.log('Making OpenAI API call...');
+    
+    // Add security context to the prompt if available
+    let securityContext = '';
+    if (req.securityContext) {
+      securityContext = `\n\nSECURITY CONTEXT: This request has been processed through security middleware. Flags detected: ${req.securityContext.heuristicFlags.join(', ') || 'none'}. Warnings: ${req.securityContext.sanitizationWarnings.join(', ') || 'none'}.`;
+    }
+    
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [
@@ -139,7 +157,7 @@ Return a JSON object with the following fields:
 - actions: array of objects with { title: string, description: string }
 - analysis: string (a paragraph summary of your reasoning)
 
-IMPORTANT: Always include a confidence percentage in the confidence field. Respond ONLY with valid JSON.`
+IMPORTANT: Always include a confidence percentage in the confidence field. Respond ONLY with valid JSON.${securityContext}`
         },
         {
           role: 'user',
@@ -171,7 +189,7 @@ IMPORTANT: Always include a confidence percentage in the confidence field. Respo
 });
 
 // Image upload endpoint with OpenAI Vision
-app.post('/api/check-scam-image', upload.single('image'), async (req, res) => {
+app.post('/api/check-scam-image', upload.single('image'), securityMiddleware.securityCheck.bind(securityMiddleware), async (req, res) => {
   console.log('Received image scam check request');
   
   try {
@@ -191,6 +209,13 @@ app.post('/api/check-scam-image', upload.single('image'), async (req, res) => {
     const imageData = fs.readFileSync(imagePath, { encoding: 'base64' });
 
     // Instruct the AI to return structured JSON
+    
+    // Add security context to the prompt if available
+    let securityContext = '';
+    if (req.securityContext) {
+      securityContext = `\n\nSECURITY CONTEXT: This request has been processed through security middleware. Flags detected: ${req.securityContext.heuristicFlags.join(', ') || 'none'}. Warnings: ${req.securityContext.sanitizationWarnings.join(', ') || 'none'}.`;
+    }
+    
     const response = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
@@ -260,7 +285,7 @@ Return a JSON object with the following fields:
 - actions: array of objects with { title: string, description: string }
 - analysis: string (a paragraph summary of your reasoning)
 
-IMPORTANT: Always include a confidence percentage in the confidence field. Respond ONLY with valid JSON.`
+IMPORTANT: Always include a confidence percentage in the confidence field. Respond ONLY with valid JSON.${securityContext}`
         },
         {
           role: 'user',
