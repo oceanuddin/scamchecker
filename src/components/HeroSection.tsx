@@ -18,6 +18,7 @@ export const HeroSection = ({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [isWiggling, setIsWiggling] = useState(false);
+  const [isTextWiggling, setIsTextWiggling] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   
   const MAX_CHARACTERS = 1000;
@@ -34,6 +35,17 @@ export const HeroSection = ({
     }
     setFileError(null);
     return true;
+  };
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    setTextInput(newValue);
+    
+    // Trigger wiggle animation when reaching the limit
+    if (newValue.length === MAX_CHARACTERS && !isTextWiggling) {
+      setIsTextWiggling(true);
+      setTimeout(() => setIsTextWiggling(false), 600);
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,12 +150,12 @@ export const HeroSection = ({
           ) : (
             <div className="flex flex-col gap-4">
               <textarea 
-                className={`w-full bg-white/5 border rounded-xl p-4 h-40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-white placeholder-white/40 ${
+                className={`w-full bg-white/5 border rounded-xl p-4 h-40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-white placeholder-white/40 transition-all ${
                   isOverLimit ? 'border-red-400 bg-red-500/10' : 'border-white/20'
-                }`}
+                } ${isTextWiggling ? 'animate-wiggle' : ''}`}
                 placeholder="Describe your situation in detail... For example: 'I received an email claiming to be from Amazon saying my account will be suspended unless I verify my information through this link...'" 
                 value={textInput} 
-                onChange={e => setTextInput(e.target.value)}
+                onChange={handleTextChange}
                 disabled={loading}
                 maxLength={MAX_CHARACTERS}
               />
