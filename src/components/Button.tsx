@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { ButtonHTMLAttributes, ReactNode } from 'react';
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  children?: ReactNode;
 }
 export const Button = ({
   children,

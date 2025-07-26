@@ -19,6 +19,8 @@ export const HeroSection = ({
   const [fileError, setFileError] = useState<string | null>(null);
   const [isWiggling, setIsWiggling] = useState(false);
   const [isTextWiggling, setIsTextWiggling] = useState(false);
+  const [missingInputError, setMissingInputError] = useState<string | null>(null);
+  const [isButtonWiggling, setIsButtonWiggling] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   
   const MAX_CHARACTERS = 1000;
@@ -58,9 +60,24 @@ export const HeroSection = ({
   };
 
   const handleSubmit = () => {
-    if (activeTab === 'text' && textInput.trim()) {
-      onCheckScam('text', textInput);
-    } else if (activeTab === 'image' && imageFile) {
+    setMissingInputError(null);
+    if (activeTab === 'text') {
+      if (!textInput.trim()) {
+        setMissingInputError('Please enter a description.');
+        setIsButtonWiggling(true);
+        setTimeout(() => setIsButtonWiggling(false), 600);
+        return;
+      }
+      if (!isOverLimit) {
+        onCheckScam('text', textInput);
+      }
+    } else if (activeTab === 'image') {
+      if (!imageFile) {
+        setMissingInputError('Please upload an image.');
+        setIsButtonWiggling(true);
+        setTimeout(() => setIsButtonWiggling(false), 600);
+        return;
+      }
       onCheckScam('image', imageFile);
     }
   };
@@ -174,7 +191,7 @@ export const HeroSection = ({
           <div className="flex justify-center">
             <Button 
               size="lg" 
-              className="group" 
+              className={`group ${isButtonWiggling ? 'animate-wiggle' : ''}`} 
               onClick={handleSubmit}
               disabled={loading || !canSubmit}
             >
@@ -190,6 +207,11 @@ export const HeroSection = ({
                 </>
               )}
             </Button>
+            {missingInputError && (
+              <div className="mt-3 text-center">
+                <span className="text-red-400 font-medium text-sm">{missingInputError}</span>
+              </div>
+            )}
           </div>
         </div>
       </GlassPanel>
