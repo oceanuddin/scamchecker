@@ -1,7 +1,7 @@
 import React from 'react';
 import { GlassPanel } from './GlassPanel';
 import { Button } from './Button';
-import { AlertCircleIcon, ShieldCheckIcon, HelpCircleIcon, ArrowLeftIcon, Link2Icon, PhoneIcon } from 'lucide-react';
+import { AlertCircleIcon, ShieldCheckIcon, HelpCircleIcon, ArrowLeftIcon, PhoneIcon } from 'lucide-react';
 
 interface ResultsPageProps {
   result: {
@@ -10,24 +10,6 @@ interface ResultsPageProps {
     redFlags?: string[];
     actions?: { title: string; description: string }[];
     analysis?: string;
-    linkAnalysis?: {
-      totalUrls: number;
-      suspiciousUrls: number;
-      redditReportsFound: number;
-      details: Array<{
-        url: string;
-        suspicious: boolean;
-        reason: string;
-        accessible: boolean;
-        title?: string;
-        redditReports: Array<{
-          title: string;
-          url: string;
-          subreddit: string;
-          score: number;
-        }>;
-      }>;
-    };
   };
   onCheckAnother: () => void;
 }
@@ -139,62 +121,6 @@ export const ResultsPage = ({ result, onCheckAnother }: ResultsPageProps) => {
         <p className="text-white/80 mb-4">{parsedResult.analysis || 'No analysis available.'}</p>
       </GlassPanel>
 
-      {/* Link Analysis Section */}
-      {parsedResult.linkAnalysis && parsedResult.linkAnalysis.details && parsedResult.linkAnalysis.details.length > 0 && (
-        <GlassPanel className="p-6 mb-8">
-          <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <Link2Icon size={20} className="text-purple-400" />
-            Link Analysis
-          </h3>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div className="bg-black/20 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-white">{parsedResult.linkAnalysis.totalUrls}</div>
-                <div className="text-sm text-white/60">URLs Found</div>
-              </div>
-              <div className="bg-black/20 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-red-400">{parsedResult.linkAnalysis.suspiciousUrls}</div>
-                <div className="text-sm text-white/60">Suspicious URLs</div>
-              </div>
-              <div className="bg-black/20 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-orange-400">{parsedResult.linkAnalysis.redditReportsFound}</div>
-                <div className="text-sm text-white/60">Reddit Reports</div>
-              </div>
-            </div>
-            {parsedResult.linkAnalysis.details.map((detail, index) => (
-              <div key={index} className={`border rounded-lg p-4 ${detail.suspicious ? 'border-red-500/30 bg-red-500/10' : 'border-green-500/30 bg-green-500/10'}`}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-white/80 truncate">{detail.url}</span>
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${detail.suspicious ? 'bg-red-500/20 text-red-300' : 'bg-green-500/20 text-green-300'}`}>
-                    {detail.suspicious ? 'SUSPICIOUS' : 'SAFE'}
-                  </span>
-                </div>
-                <p className="text-xs text-white/60 mb-2">{detail.reason}</p>
-                {detail.title && (
-                  <p className="text-xs text-white/70 mb-2">Title: {detail.title}</p>
-                )}
-                {detail.redditReports.length > 0 && (
-                  <div className="mt-3">
-                    <p className="text-xs font-medium text-orange-300 mb-2">Reddit Reports Found:</p>
-                    <div className="space-y-2">
-                      {detail.redditReports.slice(0, 3).map((report, reportIndex) => (
-                        <div key={reportIndex} className="bg-black/20 rounded p-2">
-                          <a href={report.url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-300 hover:text-blue-200 block">
-                            {report.title}
-                          </a>
-                          <div className="text-xs text-white/50 mt-1">
-                            r/{report.subreddit} • Score: {report.score}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </GlassPanel>
-      )}
       {/* Actions */}
       <div className="flex justify-center">
         <Button variant="secondary" size="lg" className="group" onClick={onCheckAnother}>

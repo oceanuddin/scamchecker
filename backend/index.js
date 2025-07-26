@@ -5,7 +5,6 @@ const OpenAI = require('openai');
 const fs = require('fs');
 const path = require('path');
 const securityMiddleware = require('./securityMiddleware');
-const linkChecker = require('./linkChecker');
 
 const app = express();
 
@@ -103,33 +102,10 @@ app.post('/api/check-scam', securityMiddleware.securityCheck.bind(securityMiddle
 
     console.log('Making OpenAI API call...');
     
-    // Analyze links in the scenario
-    let linkAnalysis = null;
-    try {
-      linkAnalysis = await linkChecker.analyzeLinks(scenario);
-      console.log('Link analysis completed:', {
-        totalUrls: linkAnalysis.totalUrls,
-        suspiciousUrls: linkAnalysis.suspiciousUrls,
-        redditReportsFound: linkAnalysis.redditReportsFound
-      });
-    } catch (error) {
-      console.error('Link analysis error:', error.message);
-      linkAnalysis = { error: 'Link analysis failed' };
-    }
-    
     // Add security context to the prompt if available
     let securityContext = '';
     if (req.securityContext) {
       securityContext = `\n\nSECURITY CONTEXT: This request has been processed through security middleware. Flags detected: ${req.securityContext.heuristicFlags.join(', ') || 'none'}. Warnings: ${req.securityContext.sanitizationWarnings.join(', ') || 'none'}.`;
-    }
-    
-    // Add link analysis context
-    let linkContext = '';
-    if (linkAnalysis && !linkAnalysis.error) {
-      linkContext = `\n\nLINK ANALYSIS: ${linkAnalysis.totalUrls} URLs found. ${linkAnalysis.suspiciousUrls} suspicious URLs detected. ${linkAnalysis.redditReportsFound} Reddit scam reports found.`;
-      if (linkAnalysis.details.length > 0) {
-        linkContext += `\nURL Details: ${linkAnalysis.details.map(d => `${d.url} (${d.suspicious ? 'SUSPICIOUS' : 'OK'})`).join(', ')}`;
-      }
     }
     
     const response = await openai.chat.completions.create({
@@ -138,8 +114,6 @@ app.post('/api/check-scam', securityMiddleware.securityCheck.bind(securityMiddle
         {
           role: 'system',
           content: `You are a professional AI security analyst. Your task is to analyze messages, emails, screenshots (via extracted text), or written descriptions submitted by users. You must determine whether the content is part of a scam or appears safe.
-
-You will also receive a LINK ANALYSIS section. If the link analysis finds suspicious or reported URLs, this should strongly influence your verdict and confidence. If any URL is flagged as suspicious or has scam reports, you should mark the overall verdict as 'Scam' or at least 'Unclear' with low confidence, and explain this in your analysis.
 
 You must return a structured analysis including:
 1. A **Verdict**: either "Scam" or "Safe"
@@ -217,7 +191,7 @@ IMPORTANT: Always include a confidence percentage in the confidence field. Respo
         },
         {
           role: 'user',
-          content: `Is this a scam? Please analyze and return the JSON as described: ${scenario}`
+          content: `Is this a scam? Please analyze and return the JSON as described: ${scenario}${securityContext}`
         }
       ],
       max_tokens: 700,
@@ -235,15 +209,6 @@ IMPORTANT: Always include a confidence percentage in the confidence field. Respo
         data.confidence = `${data.confidence} (85%)`;
       }
       
-      // Add link analysis data to the response
-      if (linkAnalysis && !linkAnalysis.error) {
-        data.linkAnalysis = {
-          totalUrls: linkAnalysis.totalUrls,
-          suspiciousUrls: linkAnalysis.suspiciousUrls,
-          redditReportsFound: linkAnalysis.redditReportsFound,
-          details: linkAnalysis.details
-        };
-      }
     } catch (e) {
       data = { analysis: response.choices[0].message.content };
     }
@@ -296,8 +261,6 @@ app.post('/api/check-scam-image', upload.single('image'), securityMiddleware.sec
         {
           role: 'system',
           content: `You are a professional AI security analyst. Your task is to analyze messages, emails, screenshots (via extracted text), or written descriptions submitted by users. You must determine whether the content is part of a scam or appears safe.
-
-You will also receive a LINK ANALYSIS section. If the link analysis finds suspicious or reported URLs, this should strongly influence your verdict and confidence. If any URL is flagged as suspicious or has scam reports, you should mark the overall verdict as 'Scam' or at least 'Unclear' with low confidence, and explain this in your analysis.
 
 You must return a structured analysis including:
 1. A **Verdict**: either "Scam" or "Safe"
