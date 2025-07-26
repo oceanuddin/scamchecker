@@ -36,14 +36,11 @@ export const HowItWorks = () => {
                     <ArrowRightIcon size={28} className="animate-pulse" />
                   </div>}
               </div>
+              {/* Mobile arrow between steps */}
+              {index < steps.length - 1 && <div className="md:hidden flex justify-center items-center py-4">
+                  <ArrowRightIcon size={24} className="rotate-90 text-blue-300/70 animate-pulse" />
+                </div>}
             </Fragment>)}
-          {/* Mobile arrows */}
-          <div className="md:hidden flex justify-center w-full col-span-1 -mt-4 mb-4">
-            <ArrowRightIcon size={24} className="rotate-90 text-blue-300/70" />
-          </div>
-          <div className="md:hidden flex justify-center w-full col-span-1 -mt-4 mb-4">
-            <ArrowRightIcon size={24} className="rotate-90 text-blue-300/70" />
-          </div>
         </div>
       </div>
     </section>;
