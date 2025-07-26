@@ -11,8 +11,10 @@ class LinkChecker {
 
   // Extract URLs from text
   extractUrls(text) {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    return text.match(urlRegex) || [];
+    // Match http(s)://, www., or bare domains (with TLD)
+    const urlRegex = /((https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[\w\-\/?#=&%\.]*)?)/g;
+    // Remove trailing punctuation from matches
+    return (text.match(urlRegex) || []).map(url => url.replace(/[.,!?;:]+$/, ''));
   }
 
   // Check if URL is suspicious

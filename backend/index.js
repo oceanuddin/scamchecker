@@ -139,6 +139,8 @@ app.post('/api/check-scam', securityMiddleware.securityCheck.bind(securityMiddle
           role: 'system',
           content: `You are a professional AI security analyst. Your task is to analyze messages, emails, screenshots (via extracted text), or written descriptions submitted by users. You must determine whether the content is part of a scam or appears safe.
 
+You will also receive a LINK ANALYSIS section. If the link analysis finds suspicious or reported URLs, this should strongly influence your verdict and confidence. If any URL is flagged as suspicious or has scam reports, you should mark the overall verdict as 'Scam' or at least 'Unclear' with low confidence, and explain this in your analysis.
+
 You must return a structured analysis including:
 1. A **Verdict**: either "Scam" or "Safe"
 2. A **Confidence Score** (0–100%)
@@ -294,6 +296,8 @@ app.post('/api/check-scam-image', upload.single('image'), securityMiddleware.sec
         {
           role: 'system',
           content: `You are a professional AI security analyst. Your task is to analyze messages, emails, screenshots (via extracted text), or written descriptions submitted by users. You must determine whether the content is part of a scam or appears safe.
+
+You will also receive a LINK ANALYSIS section. If the link analysis finds suspicious or reported URLs, this should strongly influence your verdict and confidence. If any URL is flagged as suspicious or has scam reports, you should mark the overall verdict as 'Scam' or at least 'Unclear' with low confidence, and explain this in your analysis.
 
 You must return a structured analysis including:
 1. A **Verdict**: either "Scam" or "Safe"
