@@ -5,6 +5,7 @@ const OpenAI = require('openai');
 const fs = require('fs');
 const path = require('path');
 const securityMiddleware = require('./securityMiddleware');
+const linkChecker = require('./linkChecker');
 
 const app = express();
 
@@ -102,10 +103,33 @@ app.post('/api/check-scam', securityMiddleware.securityCheck.bind(securityMiddle
 
     console.log('Making OpenAI API call...');
     
+    // Analyze links in the scenario
+    let linkAnalysis = null;
+    try {
+      linkAnalysis = await linkChecker.analyzeLinks(scenario);
+      console.log('Link analysis completed:', {
+        totalUrls: linkAnalysis.totalUrls,
+        suspiciousUrls: linkAnalysis.suspiciousUrls,
+        redditReportsFound: linkAnalysis.redditReportsFound
+      });
+    } catch (error) {
+      console.error('Link analysis error:', error.message);
+      linkAnalysis = { error: 'Link analysis failed' };
+    }
+    
     // Add security context to the prompt if available
     let securityContext = '';
     if (req.securityContext) {
       securityContext = `\n\nSECURITY CONTEXT: This request has been processed through security middleware. Flags detected: ${req.securityContext.heuristicFlags.join(', ') || 'none'}. Warnings: ${req.securityContext.sanitizationWarnings.join(', ') || 'none'}.`;
+    }
+    
+    // Add link analysis context
+    let linkContext = '';
+    if (linkAnalysis && !linkAnalysis.error) {
+      linkContext = `\n\nLINK ANALYSIS: ${linkAnalysis.totalUrls} URLs found. ${linkAnalysis.suspiciousUrls} suspicious URLs detected. ${linkAnalysis.redditReportsFound} Reddit scam reports found.`;
+      if (linkAnalysis.details.length > 0) {
+        linkContext += `\nURL Details: ${linkAnalysis.details.map(d => `${d.url} (${d.suspicious ? 'SUSPICIOUS' : 'OK'})`).join(', ')}`;
+      }
     }
     
     const response = await openai.chat.completions.create({
@@ -196,6 +220,16 @@ IMPORTANT: Always include a confidence percentage in the confidence field. Respo
       // Ensure confidence has a percentage if missing
       if (data.confidence && !data.confidence.includes('%')) {
         data.confidence = `${data.confidence} (85%)`;
+      }
+      
+      // Add link analysis data to the response
+      if (linkAnalysis && !linkAnalysis.error) {
+        data.linkAnalysis = {
+          totalUrls: linkAnalysis.totalUrls,
+          suspiciousUrls: linkAnalysis.suspiciousUrls,
+          redditReportsFound: linkAnalysis.redditReportsFound,
+          details: linkAnalysis.details
+        };
       }
     } catch (e) {
       data = { analysis: response.choices[0].message.content };
