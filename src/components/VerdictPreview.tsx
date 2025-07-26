@@ -16,13 +16,6 @@ export const VerdictPreview = () => {
     border: 'border-green-500/30',
     text: 'This appears to be legitimate communication from the company.',
     example: 'Email from your bank sent from their official domain with no urgent requests for sensitive information.'
-  }, {
-    icon: <HelpCircleIcon size={28} className="text-yellow-400" />,
-    label: '🤔 Unclear',
-    color: 'from-yellow-500/20 to-yellow-700/20',
-    border: 'border-yellow-500/30',
-    text: 'More information needed. Proceed with caution and verify through official channels.',
-    example: 'Message offering a job opportunity that seems legitimate but has some unusual requirements.'
   }];
   return <section className="py-20 px-4 relative">
       <div className="max-w-6xl mx-auto">
@@ -32,7 +25,7 @@ export const VerdictPreview = () => {
         <p className="text-center text-white/70 mb-16 max-w-2xl mx-auto">
           Our AI provides clear assessments to help you stay safe online
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {verdicts.map((verdict, index) => <GlassPanel key={index} className={`p-6 border-2 ${verdict.border} bg-gradient-to-br ${verdict.color}`}>
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-3">
