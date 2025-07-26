@@ -20,20 +20,6 @@ A sophisticated web application that uses OpenAI's AI to detect scams in text de
 - **Red Flags Detection**: Comprehensive list of suspicious indicators
 - **Recommended Actions**: Clear, actionable steps for users
 
-### 🔗 Advanced Link Analysis
-- **URL Extraction**: Automatically finds and analyzes all URLs in submissions
-- **Suspicious Pattern Detection**: Identifies crypto, login, verify, and other suspicious keywords
-- **URL Shortener Detection**: Flags known URL shorteners (bit.ly, tinyurl, etc.)
-- **Website Accessibility Check**: Verifies if URLs are accessible and extracts page titles
-- **Real-time Analysis**: Instant feedback on link safety
-
-### 🔍 Reddit Community Intelligence
-- **Community Reports**: Searches Reddit for existing scam reports
-- **Domain-based Search**: Looks for reports about specific domains/URLs
-- **Filtered Results**: Only shows relevant scam/phishing posts
-- **Direct Links**: Provides direct links to Reddit posts about scams
-- **Score & Subreddit Info**: Displays post scores and subreddit names
-
 ### 🛡️ Security Features
 - **Prompt Injection Protection**: Detects and blocks AI manipulation attempts
 - **Input Sanitization**: Cleans and normalizes user input
